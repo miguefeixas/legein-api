@@ -18,6 +18,8 @@ from src.models.review import Review  # noqa F401
 from src.models.access_token import AccessToken  # noqa F401
 from src.models.friendship import friendship  # noqa F401
 from src.models.notification import notification  # noqa F401
+from src.models.book_list import BookList  # noqa F401
+from src.models.book_list_book import book_list_book  # noqa F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
