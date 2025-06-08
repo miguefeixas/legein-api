@@ -39,3 +39,12 @@ class UpdateReviewSchema(ReviewBaseSchema):
     book_id: int
     user_id: int
     disabled: bool
+
+
+class CreateReviewSchema(BaseModel):
+    """Create review schema."""
+
+    title: str
+    content: str
+    rating: int
+    book_id: int
