@@ -1,0 +1,17 @@
+image: python:3.11
+
+stages:
+  - lint
+  - audit
+
+lint:
+  stage: lint
+  script:
+    - pip install ruff black==24.2.*
+    - ruff check .
+
+audit:
+  stage: audit
+  script:
+    - pip install safety
+    - safety check -r requirements.txt

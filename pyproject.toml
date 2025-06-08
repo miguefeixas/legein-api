@@ -1,0 +1,55 @@
+[tool.black]
+line-length = 120
+target-version = ['py310']
+skip-string-normalization = true
+include = '\.pyi?$'
+exclude = '''
+(
+  /(
+      \.eggs         # exclude a few common directories in the
+    | \.git          # root of the project
+    | \.mypy_cache
+    | .venv
+    | build
+    | dist
+  )/
+)
+'''
+
+
+[tool.ruff]
+line-length = 120
+lint.select = ['E', 'W', 'F', 'ANN', 'ISC', 'C4', 'PIE', 'T20', 'PT', 'Q', 'RSE', 'RET', 'SIM', 'ARG', 'ERA', 'COM819', 'B',
+    'D1', 'N', 'C90', 'ERA', 'N', 'S', 'T10', 'RET505']
+lint.ignore = ['D100', 'ANN102', 'ANN101', 'ANN002', 'ANN003', 'D104', 'D107', 'RET505']
+lint.unfixable = ['B']
+
+[tool.ruff.lint.flake8-quotes]
+inline-quotes = 'single'
+
+[tool.ruff.lint.per-file-ignores]
+'tests/*.py' = ['E501', 'ANN', 'ARG', 'D1', 'PT004', 'PT013', 'S101']
+'src/routers/*/*.py' = ['ANN201', 'ANN001', 'N815']
+'src/models/*/*_schema.py' = ['D101']
+'alembic/versions/*.py' = ['D103', 'W291']
+'alembic/env.py' = ['ERA001']
+
+
+[tool.pytest.ini_options]
+env = [
+    "ENV_FOR_DYNACONF = 'test'"
+]
+testpaths = [
+    "tests",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning"
+]
+
+[tool.coverage.run]
+omit = [
+    "tests/*",
+    ".venv/*",
+    "*/dist-packages/*",
+    "*/site-packages/*"
+]
