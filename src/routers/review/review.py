@@ -5,7 +5,13 @@ from fastapi import Depends, HTTPException
 from sqlalchemy import false
 from werkzeug.exceptions import abort
 
-from src.models.review import ReviewSchema, Review, ReviewBaseSchema, UpdateReviewSchema
+from src.models.review import (
+    ReviewSchema,
+    Review,
+    ReviewBaseSchema,
+    UpdateReviewSchema,
+    CreateReviewSchema,
+)
 from src.models.user import UserSchema, UserRole, User
 from src.routers.auth.auth import get_current_active_user
 from src.routers.rosetta_router import create_router
@@ -34,7 +40,7 @@ async def get_review_by_id(
 
 @router.get('/reviews-last-seven-days/', response_model=create_kpi_schema(ReviewBaseSchema))
 async def get_last_seven_days_reviews(
-    current_user: Annotated[UserSchema, Depends(get_current_active_user)]
+    current_user: Annotated[UserSchema, Depends(get_current_active_user)],
 ) -> dict[str, int | list[Review]]:
     """
     Get the list of the reviews created in the last seven days
@@ -69,6 +75,24 @@ async def get_all_reviews(current_user: Annotated[UserSchema, Depends(get_curren
         raise HTTPException(status_code=403, detail='Not enough permissions')
 
     return Review.list()
+
+
+@router.post('/', response_model=ReviewSchema)
+async def create_review(
+    review: CreateReviewSchema,
+    current_user: Annotated[UserSchema, Depends(get_current_active_user)],
+) -> Review:
+    """Create a new review."""
+
+    new_review = Review(
+        title=review.title,
+        content=review.content,
+        rating=review.rating,
+        book_id=review.book_id,
+        user_id=current_user.id,
+    )
+    Review.insert(new_review, current_user.id)
+    return new_review
 
 
 @router.put('/{review_id}/', response_model=ReviewSchema)
@@ -111,21 +135,19 @@ async def get_reviews_of_book(
 
 
 @router.get('/user/{user_id}/', response_model=list[ReviewSchema])
-async def get_reviews_of_book(
+async def get_reviews_of_user(
     user_id: str,
 ) -> list[Review]:
     """
-    Get all reviews of a book
-    :param user_id: The id of the book
-    :return: A list of all the reviews of the book
+    Get all reviews of a user
+    :param user_id: The id of the user
+    :return: A list of all the reviews of the user
     """
     return Review.list([Review.user_id == user_id, Review.disabled == false()])
 
 
 @router.get('/friends-reviews/', response_model=list[ReviewSchema])
-async def get_friends_reviews(
-    current_user: Annotated[UserSchema, Depends(get_current_active_user)]
-) -> list[Review]:
+async def get_friends_reviews(current_user: Annotated[UserSchema, Depends(get_current_active_user)]) -> list[Review]:
     """
     Get all reviews of the friends of the current user
     :param current_user: The user making the request
