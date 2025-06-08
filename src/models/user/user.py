@@ -16,6 +16,7 @@ from src.models.author import Author
 if TYPE_CHECKING:
     from src.models.notification import Notification
     from src.models.review import Review
+    from src.models.book_list import BookList
 
 
 class User(BaseUser):
@@ -45,6 +46,9 @@ class User(BaseUser):
     author: Mapped['Author'] = relationship('Author', back_populates='user', foreign_keys=author_id)
     notifications: Mapped[List['Notification']] = relationship(
         back_populates='user', foreign_keys='Notification.user_id', cascade='all, delete'
+    )
+    book_lists: Mapped[List['BookList']] = relationship(
+        'BookList', back_populates='user', foreign_keys='BookList.user_id', cascade='all, delete-orphan'
     )
 
     @hybrid_property
@@ -81,5 +85,4 @@ class User(BaseUser):
         :return: A list of all friends of the user
         """
         stmt = select(User).join(friendship, User.id == friendship.c.friend_id).where(friendship.c.user_id == user_id)
-        friends = cls.session.execute(stmt).scalars().all()
-        return friends
+        return cls.session.execute(stmt).scalars().all()
