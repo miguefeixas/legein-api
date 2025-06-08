@@ -10,6 +10,7 @@ from src.routers.review import review
 from src.routers.publisher import publisher
 from src.routers.friendship import friendship
 from src.routers.notification import notification
+from src.routers.book_list import book_list
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(root_path='/api')
@@ -36,3 +37,4 @@ app.include_router(review.router)
 app.include_router(publisher.router)
 app.include_router(friendship.router)
 app.include_router(notification.router)
+app.include_router(book_list.router)

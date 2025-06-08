@@ -1,11 +1,12 @@
 from typing import Optional, List, TYPE_CHECKING
 
-from sqlalchemy import String, ForeignKey, case, func, false
+from sqlalchemy import String, ForeignKey, case
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .book_schema import BookStatus
 from src.models.book_genre import book_genre
+from src.models.book_list_book import book_list_book
 from src.models.rosetta_item import RosettaItem
 from src.models.author_book import author_book
 from src.models.genre import Genre
@@ -14,6 +15,7 @@ from src.models.publisher import Publisher
 if TYPE_CHECKING:
     from src.models.author import Author
     from src.models.review import Review
+    from src.models.book_list import BookList
 
 
 class Book(RosettaItem):
@@ -42,6 +44,7 @@ class Book(RosettaItem):
     reviews: Mapped[List['Review']] = relationship(
         back_populates='book', foreign_keys='Review.book_id', cascade='all, delete'
     )
+    book_lists: Mapped[List['BookList']] = relationship(secondary=book_list_book, back_populates='books')
     publisher: Mapped['Publisher'] = relationship('Publisher', back_populates='books', foreign_keys=publisher_id)
 
     @classmethod
@@ -55,10 +58,9 @@ class Book(RosettaItem):
         return cls.session.scalars(qry).all()
 
     @classmethod
-    def get_random_book(cls):
+    def get_random_book(cls) -> 'Book':
         """
         Get a random book
         :return: A random book
         """
-        # return cls.session.query(cls).where(cls.disabled == false()).order_by(func.random()).first()
         return cls.session.query(cls).where(cls.id == 17).first()
